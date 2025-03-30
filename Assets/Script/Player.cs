@@ -15,6 +15,7 @@ public class Player : MonoBehaviour
     }
 
     // Update is called once per frame
+
     void Update()
     {
         // 如果按下鍵盤右方向鍵，讓外星人往X軸移動1
