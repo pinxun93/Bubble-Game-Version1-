@@ -1,10 +1,9 @@
 fileFormatVersion: 2
-guid: dca7dffa9d718e04d8e6cefca6613f90
+guid: e55a302a1a51a974ab43bcefe0cad176
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences:
-  - GrassPrefab: {fileID: 7707037011301042485, guid: 70ac28524a302bc438445fe8dd6460d6, type: 3}
+  defaultReferences: []
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

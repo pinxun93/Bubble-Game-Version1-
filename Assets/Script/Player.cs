@@ -4,39 +4,44 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    private Rigidbody2D m_rigidbody2D; // 建立一個2D剛體變數
+    private Rigidbody2D m_rigidbody2D;
+    public float moveSpeed = 3f;
+    public float jumpForce = 12f;
+    public LayerMask groundLayer;
+    public Transform groundCheck;
+    public float groundCheckRadius = 0.2f;
 
-    public float moveSpeed = 1.0f;     // 建立一個公開(public)浮點數moveSpeed
+    private bool isGrounded = false;
 
-    // Start is called before the first frame update
     void Start()
     {
-        m_rigidbody2D = GetComponent<Rigidbody2D>(); // 遊戲一執行，取得外星人的剛體
+        m_rigidbody2D = GetComponent<Rigidbody2D>();
+        Jump(); // 一開始就跳起來
     }
-
-    // Update is called once per frame
 
     void Update()
     {
-        // 如果按下鍵盤右方向鍵，讓外星人往X軸移動1
+        // 左右移動（保留原本邏輯）
+        float moveX = 0f;
+
         if (Input.GetKey(KeyCode.RightArrow))
+            moveX = moveSpeed;
+        else if (Input.GetKey(KeyCode.LeftArrow))
+            moveX = -moveSpeed;
+
+        m_rigidbody2D.velocity = new Vector2(moveX, m_rigidbody2D.velocity.y);
+
+        // 檢查是否接觸地面，且只有當角色正在下落時才觸發跳躍
+        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+
+        if (isGrounded && m_rigidbody2D.velocity.y <= 0.01f)
         {
-            m_rigidbody2D.velocity = new Vector3(moveSpeed, 0, 0);
+            Jump();
         }
-        // 如果按下鍵盤左方向鍵，讓外星人往X軸移動-1，也就是往左移動1
-        if (Input.GetKey(KeyCode.LeftArrow))
-        {
-            m_rigidbody2D.velocity = new Vector3(-moveSpeed, 0, 0);
-        }
-        // 如果右方向鍵「或」左方向鍵，被「放開」的時候，就讓所有速度都歸0
-        if (Input.GetKeyUp(KeyCode.LeftArrow) || Input.GetKeyUp(KeyCode.RightArrow))
-        {
-            m_rigidbody2D.velocity = new Vector3(0, 0, 0);
-        }
-        // 如果按下鍵盤空白鍵，讓外星人往Y軸移動1，也就是往上移動1
-        if (Input.GetKey(KeyCode.Space))
-        {
-            m_rigidbody2D.velocity = new Vector3(0, moveSpeed, 0);
-        }
+    }
+
+    void Jump()
+    {
+        m_rigidbody2D.velocity = new Vector2(m_rigidbody2D.velocity.x, jumpForce);
     }
 }
