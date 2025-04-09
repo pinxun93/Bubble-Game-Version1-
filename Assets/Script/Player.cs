@@ -16,14 +16,13 @@ public class Player : MonoBehaviour
     void Start()
     {
         m_rigidbody2D = GetComponent<Rigidbody2D>();
-        Jump(); // 一開始就跳起來
+        Invoke("InitialJump", 0.1f); // 避免初始重力干擾，延遲跳躍
     }
 
     void Update()
     {
-        // 左右移動（保留原本邏輯）
+        // 左右移動
         float moveX = 0f;
-
         if (Input.GetKey(KeyCode.RightArrow))
             moveX = moveSpeed;
         else if (Input.GetKey(KeyCode.LeftArrow))
@@ -31,9 +30,10 @@ public class Player : MonoBehaviour
 
         m_rigidbody2D.velocity = new Vector2(moveX, m_rigidbody2D.velocity.y);
 
-        // 檢查是否接觸地面，且只有當角色正在下落時才觸發跳躍
+        // 檢查是否著地
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
 
+        // 只有當角色著地、而且是往下掉的狀態，才會跳
         if (isGrounded && m_rigidbody2D.velocity.y <= 0.01f)
         {
             Jump();
@@ -42,6 +42,13 @@ public class Player : MonoBehaviour
 
     void Jump()
     {
-        m_rigidbody2D.velocity = new Vector2(m_rigidbody2D.velocity.x, jumpForce);
+        // 每次跳躍都重設 Y 軸速度，確保不會累加
+        m_rigidbody2D.velocity = new Vector2(m_rigidbody2D.velocity.x, 0f);
+        m_rigidbody2D.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+    }
+
+    void InitialJump()
+    {
+        Jump();
     }
 }
