@@ -9,6 +9,10 @@ public class PlatformSpawner : MonoBehaviour
     public float platformSpacingY = 2.5f;
     public float platformRangeX = 2.5f;
 
+    [Header("生成時間設定")]
+    public float initialDelay = 3f;   // 第一次生成延遲時間
+    public float repeatRate = 5f;     // 每幾秒生成一次
+
     private float highestY = 0f;
     private List<GameObject> platforms = new List<GameObject>();
 
@@ -21,17 +25,23 @@ public class PlatformSpawner : MonoBehaviour
         {
             SpawnPlatform(i * platformSpacingY);
         }
+        InvokeRepeating("newPlatform", 3, 5);
     }
 
-    void Update()
+    void newPlatform()
     {
         // 玩家往上爬，產生新平台
         if (player.position.y + spawnYDistance > highestY)
         {
             highestY += platformSpacingY;
             SpawnPlatform(highestY);
-        }
+            //print("Platform by PlatformSpawner (UPDATE)");
 
+        }
+    }
+
+    void Update()
+    {
         // 刪除太低的平台
         platforms.RemoveAll(p =>
         {
@@ -50,5 +60,6 @@ public class PlatformSpawner : MonoBehaviour
         Vector3 pos = new Vector3(x, y, 0);
         GameObject newPlat = Instantiate(platformPrefab, pos, Quaternion.identity);
         platforms.Add(newPlat);
+        //print("Platform by PlatformSpawner");
     }
 }

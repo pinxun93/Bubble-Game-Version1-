@@ -11,11 +11,17 @@ public class Player : MonoBehaviour
     public Transform groundCheck;
     public float groundCheckRadius = 0.2f;
 
-    private bool isGrounded = false;
+    private float lastGroundedY; // 最後一次站在地面時的高度
+    public float fallDeathThreshold = 6f; // 掉落多少距離就死亡
 
+    public GameManager gameManager; // 拖 GameManager 進來
+
+    private bool isGrounded = false;
+    private Collider2D 碰撞器;
     void Start()
     {
         m_rigidbody2D = GetComponent<Rigidbody2D>();
+        碰撞器 = this.GetComponent<Collider2D>();
         Invoke("InitialJump", 0.1f); // 避免初始重力干擾，延遲跳躍
     }
 
@@ -33,11 +39,36 @@ public class Player : MonoBehaviour
         // 檢查是否著地
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
 
-        // 只有當角色著地、而且是往下掉的狀態，才會跳
         if (isGrounded && m_rigidbody2D.velocity.y <= 0.01f)
+        {
+            lastGroundedY = transform.position.y; // 更新最後落地高度
+            Jump(); // 彈跳
+        }
+
+        // 掉下去超過 fallDeathThreshold 時，死亡
+        if (transform.position.y < lastGroundedY - fallDeathThreshold)
+        {
+            gameManager.ShowGameOver();
+        }
+
+        //Debug.Log("force:" + m_rigidbody2D.velocity.y);
+        if (m_rigidbody2D.velocity.y == 0f)
         {
             Jump();
         }
+        if (m_rigidbody2D.velocity.y <= 0.01f)
+        {
+            if (isGrounded)
+            {
+                Jump();
+            }
+            碰撞器.enabled = true;
+        }
+        else
+        {
+            碰撞器.enabled = false;
+        }
+
     }
 
     void Jump()
